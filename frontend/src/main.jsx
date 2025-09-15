@@ -19,7 +19,7 @@ createRoot(document.getElementById("root")).render(
         //useRefreshTokens={true} // 👈 allows silent renewal
       >
         <App />
-        {/* <Toaster /> */}
+        <Toaster />
       </Auth0Provider>
     </BrowserRouter>
   </StrictMode>

@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import CreatePage from "./pages/CreatePage";
 import NoteDetailPage from "./pages/NoteDetailPage";
 import { useAuth0 } from "@auth0/auth0-react";
+import LogoutPage from "./pages/LogoutPage";
 
 const App = () => {
   const { isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
@@ -21,6 +22,7 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/create" element={<CreatePage />} />
         <Route path="/note/:id" element={<NoteDetailPage />} />
+        <Route path="/logout" element={<LogoutPage />} />
       </Routes>
     </div>
   );
