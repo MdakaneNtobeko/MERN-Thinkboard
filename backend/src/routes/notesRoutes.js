@@ -1,7 +1,16 @@
-import express from 'express';
-import { createNote, deleteNote, getAllNotes, getNoteById, updateNote } from '../controllers/notesController.js';
+import express from "express";
+import { checkJwt } from "../middleware/auth.js";
+import {
+  getAllNotes,
+  getNoteById,
+  createNote,
+  updateNote,
+  deleteNote,
+} from "../controllers/notesController.js";
 
 const router = express.Router();
+
+router.use(checkJwt); // protects all routes
 
 router.get("/", getAllNotes);
 router.get("/:id", getNoteById);
