@@ -1,48 +1,62 @@
-import axios from 'axios';
-import { ArrowLeftIcon } from 'lucide-react';
-import { useState } from 'react'
-import toast from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router'
-import api from '../lib/axios';
+import axios from "axios";
+import { ArrowLeftIcon } from "lucide-react";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router";
+import api from "../lib/axios";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const CreatePage = () => {
+  const { getAccessTokenSilently } = useAuth0();
 
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-      e.preventDefault();
+    e.preventDefault();
 
-      if (!title.trim() || !content.trim()) {
-        toast.error("All fields are required");
-        return;
-      }
+    if (!title.trim() || !content.trim()) {
+      toast.error("All fields are required");
+      return;
+    }
 
-      setLoading(true);
-      try {
-        await api.post("/notes",{
-          title,
-          content
-        });
-        toast.success("Note created successfully!");
-        navigate('/');
-      } catch (error) {
-        console.log("Error creating Note", error);
-        toast.error("Failed to create Note")
-      }
-      finally {
-        setLoading(false);
-      }
+    setLoading(true);
+    try {
+      // Get the JWT for the logged-in user
+      const token = await getAccessTokenSilently({
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE, // your API identifier
+      });
+
+      // Send the token in Authorization header
+      await api.post(
+        "/notes",
+        { title, content },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Note created successfully!");
+      navigate("/");
+    } catch (error) {
+      console.log("Error creating Note", error);
+      toast.error("Failed to create Note");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
-    <div className='min-h-screen bg-base-200'>
+    <div className="min-h-screen bg-base-200">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <Link to={"/"} className="btn btn-ghost mb-6">
-            <ArrowLeftIcon className='size-5'/>
+            <ArrowLeftIcon className="size-5" />
             Back to Note
           </Link>
 
@@ -51,34 +65,39 @@ const CreatePage = () => {
               <h2 className="card-title text-2xl mb-4">Create New Note</h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-control mb-4">
-                  <label className='label'>
-                    <span className='label-text'>Title</span>
+                  <label className="label">
+                    <span className="label-text">Title</span>
                   </label>
-                  <input 
-                    type="text" 
-                    placeholder='Note Title' 
-                    className='input input-bordered' 
-                    value={title} 
-                    onChange={(e) => setTitle(e.target.value)} />
+                  <input
+                    type="text"
+                    placeholder="Note Title"
+                    className="input input-bordered"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
                 </div>
 
                 <div className="form-control mb-4">
-                  <label className='label'>
-                    <span className='label-text'>Content</span>
+                  <label className="label">
+                    <span className="label-text">Content</span>
                   </label>
-                  <textarea 
-                    type="text" 
-                    placeholder='Write your note here...' 
-                    className='textarea textarea-bordered h-32' 
-                    value={content} 
-                    onChange={(e) => setContent(e.target.value)} />
+                  <textarea
+                    type="text"
+                    placeholder="Write your note here..."
+                    className="textarea textarea-bordered h-32"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
                 </div>
 
                 <div className="card-actions justify-end">
-                  <button className="btn btn-primary" type="submit" disabled={loading}>
+                  <button
+                    className="btn btn-primary"
+                    type="submit"
+                    disabled={loading}
+                  >
                     {loading ? "Creating..." : "Create Note"}
                   </button>
-                  
                 </div>
               </form>
             </div>
@@ -86,7 +105,7 @@ const CreatePage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreatePage
+export default CreatePage;
